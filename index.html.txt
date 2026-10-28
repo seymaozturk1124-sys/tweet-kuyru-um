@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benim Tweet Panelim</title>
+    <style>
+        body { font-family: sans-serif; background-color: #121212; color: #fff; padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background-color: #1e1e1e; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #333; }
+        .tweet-box { font-size: 15px; line-height: 1.5; color: #e1e1e1; margin-bottom: 12px; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 10px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
+        .btn-copy { background-color: #333; color: white; }
+        .btn-reply { background-color: #1d9bf0; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Benim Kampanya Panelim</h2>
+    <p style="color: #aaa; font-size: 13px;">Sayfayı her yenilediğinde emojiler değişir!</p>
+    <div id="tweetContainer"></div>
+</div>
+
+<script>
+    // 1. Rastgele eklenecek emojiler kutusu
+    const emojiler = ["📄", "🔑", "📣", "📝", "⏳", "📌", "📢", "🇹🇷", "⚖️", "✨"];
+
+    //
+    const cumleler = ["Öğretmenimizin mazereti kabul edilmiş, ancak norm yetersizliği gerekçesiyle ataması yapılmamıştır. Mazeret kabul ediliyorsa çözüm de üretilmelidir. Aile bütünlüğü ve öğretmenimizin huzuru için yetkilileri göreve çağırıyoruz! #MEBMazeretMağduriyeti @EgitimBirSen @eczozgurozel",
+"Bir öğretmenin mazeretini kabul edip ardından norm yok diyerek atamasını gerçekleştirmemek, mağduriyeti ortadan kaldırmıyor. Kabul edilen mazeretler için kalıcı çözüm istiyoruz! #MEBMazeretMağduriyeti @turkegitimsen @MDervisogluTR",
+"Aile birliği anayasal ve insani bir haktır. Mazereti kabul edilen öğretmenlerimizin norm yetersizliği nedeniyle ailelerinden ayrı kalmasına artık son verilmelidir. #MEBMazeretMağduriyeti @egitimgucusen @iyiparti",
+"Öğretmenlerimizin mazeretleri kabul ediliyor ama atamaları yapılmıyor. Kâğıt üzerinde kabul edilen mazeret, hayatın içinde çözüm olmadıkça anlam taşımıyor. MEB'den somut adım bekliyoruz! #MEBMazeretMağduriyeti @egitimsen @herkesicinCHP",
+"Norm yetersizliği öğretmenlerimizin aile bütünlüğünün önünde aşılmaz bir engel olmamalı. Kabul edilen mazeretlerin gereği yerine getirilmeli, mağduriyetler giderilmelidir. #MEBMazeretMağduriyeti @egitimisorg @tipgenelmerkezz",
+"Öğretmenlerimiz ayrı şehirlerde, aileler bölünmüş, çocuklar anne ve babalarından uzak. Mazereti kabul edilen öğretmenlerin ataması için MEB çözüm üretmelidir. #MEBMazeretMağduriyeti @HurEgitimSen @zaferpartisi",
+"Mazeret tayini bir lütuf değil, haklı bir ihtiyacın karşılanmasıdır. Mazereti kabul edildiği hâlde norm yetersizliği nedeniyle atanamayan öğretmenlerimiz için adil çözüm istiyoruz. #MEBMazeretMağduriyeti @EgitimBirSen @umitozdag",
+"Öğretmenlerimizin mazeretleri kabul ediliyorsa bu kararın gereği de yerine getirilmelidir. Norm engeli gerekçe gösterilerek aileler belirsizliğe mahkûm edilmemelidir. #MEBMazeretMağduriyeti @turkegitimsen @serakadigil",
+"Bir tarafta kabul edilmiş mazeret, diğer tarafta yapılmayan atama… Öğretmenlerimizin yaşadığı bu çelişkiye artık son verilsin. #MEBMazeretMağduriyeti @egitimgucusen @eczozgurozel",
+"Öğretmenlerimizin beklentisi ayrıcalık değil; kabul edilen mazeretlerinin karşılığını alabilmek. Norm yetersizliği mağduriyetine kalıcı çözüm bekliyoruz. #MEBMazeretMağduriyeti @egitimsen @iyiparti",
+"Aile birliği için yapılan başvurular kabul ediliyor ancak atamalar gerçekleşmiyorsa burada çözülmesi gereken ciddi bir sorun vardır. MEB, öğretmenlerini mağdur bırakmamalıdır. #MEBMazeretMağduriyeti @egitimisorg @MDervisogluTR",
+"Öğretmenlerimizin ailelerinden ayrı kalması hem kendilerini hem çocuklarını etkiliyor. Kabul edilen mazeretler için norm planlaması ve ek çözüm seçenekleri hayata geçirilmelidir. #MEBMazeretMağduriyeti @HurEgitimSen @herkesicinCHP",
+"Mazeretimiz kabul edildi ama atamamız yapılmadı. Belirsizlik içinde bekleyen öğretmenler olarak sesimizin duyulmasını ve hakkaniyetli bir çözüm bulunmasını istiyoruz. #MEBMazeretMağduriyeti @EgitimBirSen @tipgenelmerkezz",
+"Norm yetersizliği öğretmenin suçu değildir. Mazereti kabul edilen öğretmenlerin atamasının yapılabilmesi için Bakanlık gerekli düzenlemeleri gerçekleştirmelidir. #MEBMazeretMağduriyeti @turkegitimsen @zaferpartisi",
+"Öğretmenler ailelerine kavuşmak için başvuru yapıyor, mazeretleri kabul ediliyor ama sonuç değişmiyor. Kabul kararları fiilî çözüme dönüşmelidir. #MEBMazeretMağduriyeti @egitimgucusen @umitozdag",
+"Bir öğretmenin en temel beklentisi ailesiyle aynı şehirde yaşayabilmek. Mazereti kabul edildiği hâlde atanamayan öğretmenlerimizin sesi olun. #MEBMazeretMağduriyeti @egitimsen @serakadigil",
+"Ataması yapılmayan her öğretmenin arkasında bekleyen bir aile, özlem duyan bir çocuk ve ertelenen bir hayat var. Bu mağduriyet görmezden gelinmemelidir. #MEBMazeretMağduriyeti @egitimisorg @eczozgurozel",
+"Mazeret kabulü tek başına yeterli değildir. Öğretmenlerimizin mağduriyetini giderecek atama planlaması yapılmalı, aile birliği hakkı korunmalıdır. #MEBMazeretMağduriyeti @HurEgitimSen @MDervisogluTR",
+"Norm yetersizliği sebebiyle ataması yapılmayan öğretmenlerimiz için MEB'den açık, şeffaf ve uygulanabilir bir çözüm takvimi bekliyoruz. #MEBMazeretMağduriyeti @EgitimBirSen @iyiparti",
+"Öğretmenlerimizin mazereti kabul edilmişken atamasız bırakılması, umutlarını ve aile düzenlerini zedeliyor. Yetkililer bu mağduriyete kayıtsız kalmamalıdır. #MEBMazeretMağduriyeti @turkegitimsen @herkesicinCHP",
+"Her öğretmenin arkasında bir hayat hikâyesi var. Mazereti kabul edilen öğretmenler norm engeli nedeniyle ailelerinden ayrı bırakılmamalıdır. #MEBMazeretMağduriyeti @egitimgucusen @tipgenelmerkezz",
+"Öğretmenlerimiz görevlerini özveriyle yaparken kendi ailelerine kavuşabilmek için mücadele ediyor. Kabul edilen mazeretlerin gereği yerine getirilsin. #MEBMazeretMağduriyeti @egitimsen @zaferpartisi",
+"Atama yapılmadığında mazeret kabulünün ne anlamı kalıyor? Öğretmenlerimizin beklentisi net: Aile bütünlüğünü koruyan, adil ve uygulanabilir bir çözüm. #MEBMazeretMağduriyeti @egitimisorg @umitozdag",
+"Norm yetersizliği nedeniyle atanamayan öğretmenlerimizin sorununu yalnızca istatistiklerle açıklamak mümkün değil. Bu sorun aileleri ve çocukları doğrudan etkiliyor. #MEBMazeretMağduriyeti @HurEgitimSen @serakadigil",
+"Mazeret tayini başvurusu kabul edilen öğretmenlerimizin atamaları için ek kontenjan, geçici görevlendirme veya başka uygulanabilir seçenekler değerlendirilmelidir. #MEBMazeretMağduriyeti @EgitimBirSen @eczozgurozel",
+"Öğretmenlerimiz ailelerine kavuşmayı bekliyor. Kabul edilen mazeretlerin norm engeline takılması, çözüm bekleyen ciddi bir insanî sorundur. #MEBMazeretMağduriyeti @turkegitimsen @MDervisogluTR",
+"Öğretmenlerimizin aile birliği hakkı ertelenemez. Norm yetersizliği gerekçesiyle ataması yapılmayan tüm mazeret mağdurları için adım atılmalıdır. #MEBMazeretMağduriyeti @egitimgucusen @iyiparti",
+"Mazeretimiz kabul edildi; şimdi tek beklentimiz atamamızın yapılması. Öğretmenlerin ve ailelerinin yaşadığı bu belirsizliğe son verilsin. #MEBMazeretMağduriyeti @egitimsen @herkesicinCHP",
+"Bir öğretmenin ailesine kavuşması yalnızca kişisel bir talep değil, aile bütünlüğünün korunması meselesidir. MEB'den çözüm bekliyoruz. #MEBMazeretMağduriyeti @egitimisorg @tipgenelmerkezz",
+"Norm yetersizliği nedeniyle ataması yapılmayan öğretmenlerimizin sesini duyun. Kabul edilen mazeretler kâğıt üzerinde kalmasın; mağduriyetler giderilsin. #MEBMazeretMağduriyeti @HurEgitimSen @zaferpartisi",
+"Öğretmenlerimizin yaşadığı mağduriyetin çözümü için sendikaların ve yetkililerin birlikte hareket etmesini bekliyoruz. Aile birliği için somut adım zamanı! #MEBMazeretMağduriyeti @EgitimBirSen @umitozdag",
+"Sayın Talat Yavuz, mazereti kabul edildiği hâlde norm yetersizliği nedeniyle atanamayan öğretmenlerin sesi olmanızı ve çözüm için girişimde bulunmanızı bekliyoruz. #MEBMazeretMağduriyeti @*talatyavuz",
+"Sayın Aydın, aile birliği mazereti kabul edilen ancak ataması yapılmayan öğretmenlerimizin mağduriyeti giderek büyüyor. Bu konuda desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @Sdka_Aydin",
+"Sayın Muammer Karaman, mazereti kabul edilip norm yetersizliği nedeniyle atanamayan öğretmenlerimiz için çözüm çağrımızı duyun. Aile bütünlüğü korunmalıdır. #MEBMazeretMağduriyeti @MuammerKaraman",
+"Sayın Ali Deniz, öğretmenlerimizin kabul edilen mazeretlerinin atamaya dönüşmesi için sesimize ses olmanızı istiyoruz. #MEBMazeretMağduriyeti @alideniz02",
+"@egitimbirsentv mazereti kabul edildiği hâlde norm yetersizliği nedeniyle atanamayan öğretmenlerin sorununu gündeme taşımanızı bekliyoruz. Aileler çözüm bekliyor! #MEBMazeretMağduriyeti",
+"Sayın Mesut Öner, mazeret mağduru öğretmenlerimizin sesi olun. Kabul edilen mazeretlerin gereği yerine getirilmeli, aile birliği sağlanmalıdır. #MEBMazeretMağduriyeti @mesutoner45",
+"Sayın EBS Kadın Komisyonu, aile birliği mazereti kabul edildiği hâlde ataması yapılmayan öğretmenlerimizin yaşadığı sorun kadınları ve çocukları da doğrudan etkiliyor. Desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @ebskadin",
+"Sayın Aziz Aydın, norm yetersizliği sebebiyle ataması yapılamayan mazeret mağduru öğretmenler için çözüm çağrımıza destek olmanızı bekliyoruz. #MEBMazeretMağduriyeti @azizaydin46",
+"Sayın Talip Geylan, kabul edilen mazeretlere rağmen ataması yapılmayan öğretmenlerimizin mağduriyeti için girişimde bulunulmasını talep ediyoruz. #MEBMazeretMağduriyeti @TalipGeylan06",
+"Sayın Önder, norm yetersizliği nedeniyle atanamayan öğretmenlerimizin yaşadığı mağduriyetin giderilmesi için sesimizi duyurmanıza ihtiyacımız var. #MEBMazeretMağduriyeti @sdolgun01",
+"Sayın Orhan Kütük, mazereti kabul edilip ataması yapılmayan öğretmenlerimizin sorununu gündeme taşımanızı ve çözüm için destek vermenizi bekliyoruz. #MEBMazeretMağduriyeti @orhankutuk41",
+"Sayın Mahmut Kabayel, öğretmenlerimizin aile bütünlüğü için kabul edilen mazeretlerin fiilen karşılık bulması gerekiyor. Bu konuda desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @MahmutSKabayel",
+"Sayın İrfan Bey, norm yetersizliği gerekçesiyle atanamayan öğretmenlerimizin mağduriyetini çözmek için yetkililer nezdinde girişimde bulunulmasını istiyoruz. #MEBMazeretMağduriyeti @irfan6487",
+"Sayın Hüsamettin Bey, mazereti kabul edildiği hâlde ataması yapılamayan öğretmenlerimizin ailelerine kavuşması için çözüm çağrımıza destek olun. #MEBMazeretMağduriyeti @husami_husami",
+"Sayın Prof. Dr. Fatih İşcan, mazeret kabulü sonrası ataması gerçekleştirilmeyen öğretmenlerin yaşadığı norm mağduriyetine dikkat çekmenizi bekliyoruz. #MEBMazeretMağduriyeti @prfdrfatihiscan",
+"Sayın Oğuz Özat, aile birliği mazereti kabul edilen ancak norm yetersizliği sebebiyle atanamayan öğretmenlerimizin sesi olun. #MEBMazeretMağduriyeti @oguzozat",
+"Sayın Mesut Yıldırım, mazeret mağduru öğretmenlerimizin atama sorunu için çözüm üretilmesini ve aile bütünlüğünün korunmasını talep ediyoruz. #MEBMazeretMağduriyeti @mesutykdrm_pdr",
+"Sayın Nur Müdür, mazereti kabul edilmesine rağmen atanamayan öğretmenlerimizin yaşadığı belirsizlik ve aile ayrılığına dikkat çekmenizi bekliyoruz. #MEBMazeretMağduriyeti @nurmudersin",
+"Sayın Sinem Özcan, kabul edilen mazeretlerin atamaya dönüşmesi ve öğretmenlerimizin mağduriyetinin giderilmesi için desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @sinmozcan",
+"Sayın Ahmet Ölçer, norm yetersizliği sebebiyle ataması yapılmayan öğretmenlerimiz için somut çözüm çağrımıza destek olun. #MEBMazeretMağduriyeti @olcerahmet",
+"Sayın Mahmut Özay, öğretmenlerimizin aile birliği mazeretlerinin kâğıt üzerinde kalmaması için gerekli girişimlerde bulunmanızı istiyoruz. #MEBMazeretMağduriyeti @Mahmut__ozay",
+"Sayın Esra Hanım, mazereti kabul edildiği hâlde atanamayan öğretmenlerimizin yaşadığı mağduriyetin giderilmesi için sesimizi duyurun. #MEBMazeretMağduriyeti @esnungr",
+"Sayın Resul Partici, norm yetersizliği nedeniyle ataması yapılmayan öğretmenlerimizin ailelerine kavuşması için çözüm bekliyoruz. #MEBMazeretMağduriyeti @resulpartici1",
+"Sayın İbrahim Topallar, kabul edilen mazeretlere rağmen atanamayan öğretmenlerimizin mağduriyeti için sesimizi yetkililere ulaştırmanızı bekliyoruz. #MEBMazeretMağduriyeti @ibrahimtopallar",
+"Sayın Ali Deniz Koç, aile birliği mazereti kabul edilen öğretmenlerimizin atamalarının yapılması için destek ve girişimlerinizi bekliyoruz. #MEBMazeretMağduriyeti @alidenizkoc",
+"Sayın Ayhan Bey, norm yetersizliği nedeniyle atanamayan mazeret mağduru öğretmenlerimizin sesi olun; aile bütünlüğü için çözüm istiyoruz. #MEBMazeretMağduriyeti @Ayhan5558",
+"Sayın Simge Yardım, mazereti kabul edildiği hâlde atanamayan öğretmenlerimizin sorununu gündeme taşıyarak çözüm çağrımıza destek olmanızı bekliyoruz. #MEBMazeretMağduriyeti @yardimsimge",
+"Sayın Kemal Irmak, mazeret kabulü sonrası ataması yapılmayan öğretmenlerimizin norm mağduriyeti için gerekli adımların atılmasını talep ediyoruz. #MEBMazeretMağduriyeti @KemalIrmak_",
+"Sayın İzzet İldes, öğretmenlerimizin aile birliği mazeretlerinin gerçek bir çözüme kavuşması için sesimizi duyurmanızı istiyoruz. #MEBMazeretMağduriyeti @izzet_ildes",
+"Sayın Seher Ergin, mazereti kabul edilen ancak norm yetersizliği nedeniyle atanamayan öğretmenlerimizin yaşadığı mağduriyet için desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @SeherErgiin",
+"Sayın Dağdelen, ailelerinden ayrı kalan ve atama bekleyen öğretmenlerimizin mağduriyetini gündeme taşımanızı rica ediyoruz. #MEBMazeretMağduriyeti @dagdelen77",
+"Sayın Yeliz Naz, kabul edilen mazeretlere rağmen ataması yapılamayan öğretmenlerimizin aile birliği hakkı için sesimizi duyurmanıza ihtiyacımız var. #MEBMazeretMağduriyeti @yeliznaz1978",
+"Sayın Veli Fırat Şimşek, norm yetersizliği gerekçesiyle ataması yapılmayan öğretmenlerimizin mağduriyetinin giderilmesi için destek bekliyoruz. #MEBMazeretMağduriyeti @velifiratsimsek",
+"Sayın Bülent Metin, öğretmenlerimizin mazeretleri kabul edilmişken atamalarının yapılmaması ciddi bir mağduriyet oluşturuyor. Çözüm için sesimiz olun. #MEBMazeretMağduriyeti @blntmtn",
+"Sayın Hüseyin Selçuk, aile birliği mazereti kabul edilen öğretmenlerimizin norm engeli nedeniyle atanamaması sorununa dikkat çekmenizi bekliyoruz. #MEBMazeretMağduriyeti @_huseyinselcuk",
+"Sayın Kadem Özbay, mazeret mağduru öğretmenlerimizin atama sorununa çözüm bulunması ve aile bütünlüğünün korunması için desteğinizi istiyoruz. #MEBMazeretMağduriyeti @kademozbay",
+"Sayın Levent Kuruoğlu, kabul edilen mazeretlerin fiilen karşılık bulması için norm yetersizliği mağduriyetine çözüm çağrımızı destekleyin. #MEBMazeretMağduriyeti @Leventkuruoglu",
+"Sayın Oğuz İduğ, mazereti kabul edilmesine rağmen ataması yapılamayan öğretmenlerimizin yaşadığı sorunların çözülmesi için sesimizi duyurun. #MEBMazeretMağduriyeti @oguzidug",
+"Sayın Ömer Özyavuz, aile birliği mazereti kabul edilen ancak norm yetersizliği sebebiyle atanamayan öğretmenlerimiz için çözüm bekliyoruz. #MEBMazeretMağduriyeti @OmerOzyavuz06",
+"Sayın Erol Usta, mazeret mağduru öğretmenlerimizin sorununu gündeme taşımanızı ve aile bütünlüğünün korunması için destek olmanızı bekliyoruz. #MEBMazeretMağduriyeti @_erol_usta",
+"Sayın Özgür Özel, mazeretleri kabul edildiği hâlde norm yetersizliği nedeniyle ataması yapılmayan öğretmenlerimizin mağduriyetini gündeme taşımanızı ve çözüm için destek vermenizi bekliyoruz. #MEBMazeretMağduriyeti @eczozgurozel",
+"Sayın İYİ Parti yetkilileri, aile birliği mazereti kabul edilen ancak ataması yapılmayan öğretmenlerimizin sorununa çözüm bulunması için desteğinizi bekliyoruz. #MEBMazeretMağduriyeti @iyiparti",
+"Sayın Müsavat Dervişoğlu, mazereti kabul edildiği hâlde atanamayan öğretmenlerimizin yaşadığı mağduriyetin giderilmesi için konuyu gündeme taşımanızı istiyoruz. #MEBMazeretMağduriyeti @MDervisogluTR",
+"Sayın Zafer Partisi yetkilileri, öğretmenlerimizin aile bütünlüğünü etkileyen norm yetersizliği mağduriyetine dikkat çekmenizi ve çözüm çağrımıza destek olmanızı bekliyoruz. #MEBMazeretMağduriyeti @zaferpartisi",
+"Sayın Ümit Özdağ, mazeretleri kabul edildiği hâlde atamaları yapılmayan öğretmenlerimizin yaşadığı sorun için çözüm çağrımızı duyurmanızı bekliyoruz. #MEBMazeretMağduriyeti @umitozdag",
+"Sayın CHP yetkilileri, mazereti kabul edilip norm yetersizliği nedeniyle atanamayan öğretmenlerimizin mağduriyetini Meclis gündemine taşımanızı talep ediyoruz. #MEBMazeretMağduriyeti @herkesicinCHP",
+"Sayın Serra Kadıgil, aile birliği mazereti kabul edildiği hâlde atanamayan öğretmenlerimizin sesini duyurmanızı ve haklı taleplerine destek olmanızı bekliyoruz. #MEBMazeretMağduriyeti @serakadigil",
+"Sayın TİP yetkilileri, norm yetersizliği nedeniyle atanamayan mazeret mağduru öğretmenlerin sorununa çözüm bulunması için sesimize ses olun. #MEBMazeretMağduriyeti @tipgenelmerkezz",
+"Bir öğretmenin ailesine kavuşması için daha ne kadar beklemesi gerekiyor? Mazereti kabul edilen öğretmenlerin atamaları yapılmalı, aileler belirsizlikten kurtarılmalıdır. #MEBMazeretMağduriyeti @eczozgurozel @EgitimBirSen",
+"Mazeret kabulü bir sonuç değil, çözümün başlangıcı olmalıdır. Norm yetersizliği nedeniyle ataması yapılamayan öğretmenlerimiz için ek kontenjan ve alternatif yerleştirme seçenekleri değerlendirilmelidir. #MEBMazeretMağduriyeti @MDervisogluTR @turkegitimsen",
+"Öğretmenlerimizin aileleriyle aynı şehirde yaşama talebi görmezden gelinemez. Mazereti kabul edilen öğretmenlerimizin atama sorununa kalıcı çözüm istiyoruz. #MEBMazeretMağduriyeti @iyiparti @egitimgucusen",
+"Öğretmenlerimiz görevlerini yerine getiriyor, ailelerine kavuşmak için ise beklemek zorunda kalıyor. MEB, kabul ettiği mazeretlerin gereğini yerine getirmelidir. #MEBMazeretMağduriyeti @zaferpartisi @egitimsen",
+"Norm yetersizliği gerekçesiyle ataması yapılmayan öğretmenlerimiz yalnızca bir atama değil, aile bütünlüğü ve huzurlu bir yaşam bekliyor. #MEBMazeretMağduriyeti @umitozdag @egitimisorg",
+"Öğretmenlerimizin mağduriyetini çözmek için yeni bir yol haritası hazırlanmalı. Kabul edilen mazeretler, uygulanabilir bir atama planıyla desteklenmelidir. #MEBMazeretMağduriyeti @serakadigil @HurEgitimSen",
+"Her geçen gün ailelerinden ayrı kalan öğretmenlerimiz için kaybedilen zamanın telafisi yok. Mazeret mağduriyetine çözüm bulunmasını istiyoruz. #MEBMazeretMağduriyeti @eczozgurozel @turkegitimsen",
+"Öğretmenlerimizin kabul edilmiş mazeretleri norm engeline takılı kalmamalı. Bakanlık, aile birliğini sağlayacak somut adımları gecikmeden atmalıdır. #MEBMazeretMağduriyeti @MDervisogluTR @EgitimBirSen",
+"Bu mağduriyet sadece öğretmenleri değil, eşlerini ve çocuklarını da etkiliyor. Mazereti kabul edilen öğretmenlerin atanması için çözüm bekliyoruz. #MEBMazeretMağduriyeti @herkesicinCHP @egitimgucusen",
+"Öğretmenlerimizin aile birliği hakkı, norm planlamasındaki eksiklikler nedeniyle belirsizliğe terk edilmemelidir. MEB'den adil bir çözüm talep ediyoruz. #MEBMazeretMağduriyeti @tipgenelmerkezz @egitimsen",
+"Öğretmenlerimizin sesi duyulana, mazeretleri fiilen karşılanana kadar bu sorunu gündemde tutacağız. Aile birliği için çözüm şimdi! #MEBMazeretMağduriyeti @zaferpartisi @egitimisorg",
+"Norm yetersizliği nedeniyle atanamayan öğretmenlerimiz için sendikalar ve siyasi temsilciler birlikte çözüm aramalı. Bu mesele ailelerin geleceğini ilgilendiriyor. #MEBMazeretMağduriyeti @umitozdag @HurEgitimSen",
+"Bir başvurunun kabul edilip sonrasında atama yapılmaması, öğretmenleri çözümsüzlükle karşı karşıya bırakıyor. Kabul edilen mazeretlerin gereği yerine getirilsin. #MEBMazeretMağduriyeti @serakadigil @EgitimBirSen",
+"Öğretmenlerimizin ailelerine kavuşması için norm yetersizliği engel olmaktan çıkarılmalı. Adil, şeffaf ve uygulanabilir bir çözüm istiyoruz. #MEBMazeretMağduriyeti @eczozgurozel @turkegitimsen",
+"Sayın yetkililer, mazeretleri kabul edildiği hâlde ataması yapılamayan öğretmenlerin yaşadığı mağduriyet için bir çözüm takvimi açıklanmasını bekliyoruz. #MEBMazeretMağduriyeti @MDervisogluTR @egitimgucusen",
+"Öğretmenlerimiz ailelerinden ayrı kalmak istemiyor; yalnızca kabul edilmiş mazeretlerinin gereğinin yapılmasını istiyor. Bu haklı talep karşılıksız bırakılmamalıdır. #MEBMazeretMağduriyeti @iyiparti @egitimsen",
+"Norm yetersizliği öğretmenlerimizin aile düzenini bozmak zorunda değil. Ek yerleştirme ve farklı çözüm yolları değerlendirilerek mağduriyet giderilebilir. #MEBMazeretMağduriyeti @zaferpartisi @egitimisorg",
+"Mazeret tayini başvurusu kabul edilen öğretmenlerimize yalnızca beklemeleri söylenmemeli; atama için somut seçenekler sunulmalıdır. #MEBMazeretMağduriyeti @umitozdag @HurEgitimSen",
+"Öğretmenlerimizin yaşadığı bu mağduriyetin çözümü için kamuoyunun desteğine ihtiyacımız var. Kabul edilen mazeretler atamayla sonuçlansın! #MEBMazeretMağduriyeti @herkesicinCHP @EgitimBirSen",
+"Aile birliği için yapılan başvuruların kabul edilmesi umut veriyor; ancak atama yapılmadığında bu umut yerini belirsizliğe bırakıyor. Çözüm bekliyoruz. #MEBMazeretMağduriyeti @eczozgurozel @egitimgucusen",
+"Öğretmenlerimizin ailelerinden ayrı yaşaması ne kadar sürecek? Norm yetersizliği nedeniyle atanamayan mazeret mağdurları için MEB artık adım atmalıdır. #MEBMazeretMağduriyeti @MDervisogluTR @egitimsen",
+"Öğretmenlerin aile bütünlüğü, eğitim sisteminin insanî boyutunun bir parçasıdır. Kabul edilen mazeretlerin uygulanması için gerekli düzenlemeler yapılmalıdır. #MEBMazeretMağduriyeti @iyiparti @egitimisorg",
+"Mazereti kabul edilen öğretmenlerin atamalarının yapılmaması, ailelerin geleceğini belirsizliğe sürüklüyor. Bakanlık, öğretmenlerini dinlemeli ve çözüm üretmelidir. #MEBMazeretMağduriyeti @zaferpartisi @HurEgitimSen",
+"Öğretmenlerimizin talebi açık: Kabul edilen mazeretlerinin gereği yerine getirilsin, norm yetersizliği mağduriyeti sona ersin. #MEBMazeretMağduriyeti @umitozdag @EgitimBirSen",
+"Bir öğretmenin aile özlemi, bir çocuğun anne ya da babasından uzak büyümesi sıradan bir mesele değildir. Mazeret mağduriyetine çözüm istiyoruz. #MEBMazeretMağduriyeti @serakadigil @turkegitimsen",
+"Atama bekleyen öğretmenlerimizin sesini duyun. Mazeret kabulü sonrası yaşanan norm yetersizliği sorunu, öğretmenlerimizin aile hayatını doğrudan etkiliyor. #MEBMazeretMağduriyeti @eczozgurozel @egitimsen",
+"Öğretmenlerimizin aile birliğini sağlayacak çözümler ertelenmemeli. Norm yetersizliği nedeniyle ataması yapılmayan herkes için adil bir yol bulunmalıdır. #MEBMazeretMağduriyeti @MDervisogluTR @egitimisorg",
+"Mazeret mağduru öğretmenlerimizin sorunu yalnızca bir atama meselesi değil; aile, huzur ve adalet meselesidir. Yetkililerden kalıcı çözüm bekliyoruz. #MEBMazeretMağduriyeti @herkesicinCHP @HurEgitimSen",
+"Öğretmenlerimiz mazeretlerini belgeledi, başvuruları kabul edildi; şimdi atamalarının yapılmasını bekliyorlar. Bu belirsizlik artık sona ermeli. #MEBMazeretMağduriyeti @tipgenelmerkezz @EgitimBirSen",
+"Norm yetersizliği sebebiyle ataması yapılmayan öğretmenlerimizin mağduriyeti çözümsüz değildir. Bakanlık, sendikalar ve siyasi temsilciler ortak bir çözüm için harekete geçmelidir. #MEBMazeretMağduriyeti @zaferpartisi @turkegitimsen",
+"Öğretmenlerimizin kabul edilen mazeretlerinin karşılığını alması için güçlü bir kamuoyu desteği gerekiyor. Aile bütünlüğü için sesimizi yükseltelim. #MEBMazeretMağduriyeti @umitozdag @egitimgucusen",
+"Ataması yapılmayan öğretmenlerimizin yaşadığı belirsizlik her geçen gün büyüyor. MEB'den açık bir açıklama ve uygulanabilir bir çözüm bekliyoruz. #MEBMazeretMağduriyeti @eczozgurozel @egitimsen",
+"Öğretmenlerimizin aileleriyle aynı yerde yaşayabilmesi için kabul edilen mazeretler fiilen karşılanmalıdır. Norm engeli, çözümsüzlüğün bahanesi olmamalıdır. #MEBMazeretMağduriyeti @MDervisogluTR @HurEgitimSen",
+"Bu çağrı bir ayrıcalık talebi değil, aile birliğinin korunması talebidir. Mazereti kabul edilip ataması yapılmayan öğretmenlerimizin yanında olun. #MEBMazeretMağduriyeti @iyiparti @EgitimBirSen",
+"Öğretmenlerimizin ailelerinden ayrı kalmasına neden olan bu belirsizlik sona ermeli. Mazeret mağduriyeti için ek atama seçenekleri değerlendirilmelidir. #MEBMazeretMağduriyeti @serakadigil @egitimisorg",
+"Öğretmenlerimiz yalnızca görev yerlerinin değil, aile hayatlarının da planlanmasını istiyor. Kabul edilen mazeretlerin gereği yerine getirilsin. #MEBMazeretMağduriyeti @herkesicinCHP @turkegitimsen",
+"Norm yetersizliği nedeniyle ataması yapılamayan öğretmenlerimizin mağduriyetini gündemde tutmaya devam edeceğiz. Aile birliği için somut çözüm istiyoruz. #MEBMazeretMağduriyeti @tipgenelmerkezz @egitimgucusen",
+"Öğretmenlerimizin mazeretleri kabul edilmişse artık çözüm aşamasına geçilmelidir. Belirsizlik değil, adil ve uygulanabilir bir atama planı bekliyoruz. #MEBMazeretMağduriyeti @eczozgurozel @HurEgitimSen"];
+
+    const hedefTweetID = "211505684618871"; // Yanıt verilecek ana tweetin ID'si
+    const container = document.getElementById('tweetContainer');
+
+    cumleler.forEach((metin, index) => {
+        // Metnin sonuna rastgele iki emoji ekleme sihri
+        let rastgeleEmoji = " " + emojiler[Math.floor(Math.random() * emojiler.length)] + " " + emojiler[Math.floor(Math.random() * emojiler.length)];
+        let sonHali = metin + rastgeleEmoji;
+
+        let tweetIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(sonHali)}&in_reply_to=${hedefTweetID}`;
+
+        let kart = `
+            <div class="card">
+                <div style="font-size: 12px; color: #888; margin-bottom: 8px;">#${index + 1}</div>
+                <div class="tweet-box" id="tw-${index}">${sonHali}</div>
+                <div class="btn-group">
+                    <button class="btn btn-copy" onclick="kopyala(${index})">Kopyala</button>
+                    <a href="${tweetIntentUrl}" target="_blank" class="btn btn-reply">Yanıtla</a>
+                </div>
+            </div>
+        `;
+        container.innerHTML += kart;
+    });
+
+    function kopyala(id) {
+        let yazi = document.getElementById(`tw-${id}`).innerText;
+        navigator.clipboard.writeText(yazi);
+        alert("Kopyalandı!");
+    }
+</script>
+
+</body>
+</html>
